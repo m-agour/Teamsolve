@@ -10,9 +10,8 @@ DB_NAME = "database.db"
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
-    # app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:/DB_NAME}'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(str(os.getcwdb()), str(DB_NAME))
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/raaed/Desktop/Projects/Teamsolve/database.db"
+    PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(PROJECT_ROOT, 'database.db')
     db.init_app(app)
 
     from .views import views
