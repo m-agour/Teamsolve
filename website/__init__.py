@@ -1,8 +1,7 @@
 import json
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
+import os
 from flask_login import LoginManager
 
 db = SQLAlchemy()
@@ -11,7 +10,9 @@ DB_NAME = "database.db"
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:/DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(str(os.getcwdb()), str(DB_NAME))
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/raaed/Desktop/Projects/Teamsolve/database.db"
     db.init_app(app)
 
     from .views import views
@@ -27,9 +28,9 @@ def create_app():
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
-    with app.app_context():
-        if not Problem.query.get(int(1)):
-            load_problems(app)
+    # with app.app_context():
+    #     if not Problem.query.get(int(1)):
+    #         load_problems(app)
             # test()
 
     @login_manager.user_loader
@@ -40,7 +41,7 @@ def create_app():
 
 
 def create_database(app):
-    if not path.exists('website/' + DB_NAME):
+    if not os.path.exists('website/' + DB_NAME):
         db.create_all(app=app)
         print('Created Database!')
 
