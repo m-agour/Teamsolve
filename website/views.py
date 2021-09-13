@@ -60,6 +60,12 @@ def settings():
                 flash("Please enter the goal.", category='error')
                 return render_template("team.html", user=current_user)
 
+            try:
+                index = int(request.form.get('index'))
+            except:
+                flash("Please enter the index.", category='error')
+                return render_template("team.html", user=current_user)
+
             if not name:
                 flash('Please enter a name.', category='error')
 
@@ -69,10 +75,17 @@ def settings():
             elif number > 50:
                 flash('Woo! take it easy champ, leave some for next month. (max is 50 per day)', category='error')
 
+            elif index <= 0:
+                flash('Index must be positive.', category='error')
+
+            elif index > 7000:
+                flash('Index is so large.', category='error')
+
             else:
                 team = get_team()
                 team.name = name
                 team.problemsNum = number
+                team.index = index
                 db.session.commit()
                 flash('Team settings has been modified!', category='success')
                 return redirect(url_for('views.settings'))

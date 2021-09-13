@@ -4,7 +4,6 @@
    <form method="POST">
       <h3 style="color: black; "  align="center">Change team settings</h3>
       <br>
-      <br>
       <center>
       <div class="form-group">
          <label style="color: black;"  form="name">Team Name</label>
@@ -14,6 +13,11 @@
       <div class="form-group">
          <label style="width: 100px;color: black;" form="name">Daily goal</label>
          <input type="number" style="width: 300px;color: red; text-align: center;" step="1" min="1" max="50" value="{{team.problemsNum}}" class="form-control" id="number" name="number" placeholder="Enter problems number per day">
+      </div>
+	  <br>
+	  <div class="form-group">
+         <label style="width: 100px;color: black;" form="name">Index</label>
+      <input type="number" style="width: 300px;color: red; text-align: center;" step="1" min="0" value="{{team.index}}" class="form-control" id="index" name="index" placeholder="Enter index ">
       </div>
       <br>
       <br>
