@@ -27,10 +27,10 @@ def create_app():
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
-    # with app.app_context():
-    #     if not Problem.query.get(int(1)):
-    #         load_problems(app)
-            # test()
+    with app.app_context():
+        if not Problem.query.get(int(1)):
+            load_problems(app)
+            test()
 
     @login_manager.user_loader
     def load_user(id):
