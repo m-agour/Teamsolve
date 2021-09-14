@@ -6,3 +6,4 @@ SQLAlchemy==1.4.23
 Werkzeug~=1.0.1
 gunicorn 
 APScheduler~=3.7.0
+psycopg2
