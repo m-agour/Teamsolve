@@ -8,13 +8,13 @@ import psycopg2
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
-heroku = True
+sqlite = False
 
 
 def create_app():
     app = Flask(__name__)
-    if heroku:
-        app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    if not sqlite:
+        # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
         app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
 
