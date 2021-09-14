@@ -48,6 +48,7 @@ def generate_problems_stats():
         problem_solve_count[merged] = count
     return problem_solve_count
 
+
 def get_solved_problems(handle):
     solved = []
     user = get_user_submissions(handle)

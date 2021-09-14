@@ -186,6 +186,7 @@ def someone_solved_today():
 
 
 def update_user_solved_problems(user):
+    sol = False
     solved_on_codeforces = get_solved_problems(user.handle)
     solutions = user.solutions
     for i in solved_on_codeforces:
@@ -194,16 +195,20 @@ def update_user_solved_problems(user):
         if not problem:
             problem = Problem.query.filter(Problem.code == i).first()
             if problem:
+                sol = True
                 user.solutions.append(problem)
         else:
             db.session.commit()
-            return
+            return sol
         db.session.commit()
+        return sol
 
 
 def update_user_and_mates(team):
     for i in User.query.filter_by(teamId=team.id).all():
-        update_user_solved_problems(i)
+        if update_user_solved_problems(i):
+            team.solvedToday = True
+            db.session.commit()
 
 
 def update_all_teams():
