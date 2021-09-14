@@ -1,0 +1,70 @@
+Parameters:
+  SubnetId:
+    Description: Choose one of default vpc subnets to place the instance.
+    Type: 'AWS::EC2::Subnet::Id'
+    ConstraintDescription: must be the id of an existing subnet of default vpc.
+
+  KeyName:
+    Description: Choose an existing EC2 KeyPair to enable SSH access to the instance.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+    Default: ec2key
+  # AMIID: 
+  #   Description: AMI ID. Leave default for Amazon Linux 2 lts.
+  #   Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+  #   Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
+  TeamSolveProductionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow ssh & http connections from anywhere
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  TeamlSolveInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0747bdcabd34c712a
+      InstanceType: t2.micro
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !GetAtt TeamSolveProductionSecurityGroup.GroupId
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: "Name"
+          Value: TeamSolveServer
+      UserData:
+        'Fn::Base64':
+          !Sub |
+            #!/bin/bash
+              apt-get update -y
+              apt-get install apache2 -y
+              apt-get install libapache2-mod-wsgi -y
+              apt-get install python3
+              apt-get install python3-pip 
+              pip install flask
+      
+  # TeamSolveEIP:
+  #   Type: AWS::EC2::EIP
+  #   Properties:
+  #     InstanceId: !Ref TeamlSolveInstance
+
+
+Outputs:
+  BaseUrl:
+    Value: !Join
+      - ''
+      - - http://
+        - !GetAtt TeamlSolveInstance.PublicDnsName
+  
+  TeamSolveSshConnection:
+    Value: !Sub |
+              ssh -i "${KeyName}.pem" ubuntu@${TeamlSolveInstance.PublicDnsName}
