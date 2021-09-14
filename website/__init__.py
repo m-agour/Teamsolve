@@ -31,7 +31,11 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/')
 
     from .models import User, Team, Problem
-    db.create_all(app=app)
+
+    try:
+        db.create_all(app=app)
+    except:
+        ...
     create_database(app)
 
     login_manager = LoginManager()
