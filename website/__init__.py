@@ -3,6 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_login import LoginManager
+import psycopg2
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -14,8 +15,8 @@ def create_app():
     app = Flask(__name__)
     if heroku:
         app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://orupqqgwdlvxul:c7e360feef42ad78d9462b9c06fff17db75d9279d433721a0fe46631a7dd30a4@ec2-54-195-195-81.eu-west-1.compute.amazonaws.com:5432/db3ispo57pnp2j"
-
+        app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
+        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
 
     else:
         app.config['SECRET_KEY'] = 'hello darkness my old friend'
