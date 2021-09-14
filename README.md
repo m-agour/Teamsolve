@@ -10,7 +10,7 @@ The purpose of this website is to help programmers dive into competitive program
    **How to run**
   
  - Make sure you install the requirements 
-`pip install -r requirements.txt`
+`sudo pip3 install -r requirements.txt`
  - `python app.py`
  - App will run on http://127.0.0.1:5000/
  
@@ -19,3 +19,4 @@ statistics will be added later.
 
 #
 
+sudo ln -sT ~/flaskapp /var/www/html/flaskapp
