@@ -1,6 +1,5 @@
 from . import db
 from flask_login import UserMixin
-import dateutil
 
 sols = db.Table('sols',
                 db.Column('user_id', db.Integer, db.ForeignKey('user.id')),

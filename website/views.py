@@ -1,14 +1,10 @@
 import datetime
-from random import random, choice
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 from .models import User, Team, Problem
-from time import time
 from .auth import encrypt_id
-from time import time
+
 
 views = Blueprint("views", __name__)
 
