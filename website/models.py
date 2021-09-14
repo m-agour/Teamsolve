@@ -1,10 +1,16 @@
 from . import db
 from flask_login import UserMixin
+import dateutil
 
 sols = db.Table('sols',
                 db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
                 db.Column('problem_id', db.Integer, db.ForeignKey('problem.id'))
                 )
+
+due = db.Table('due',
+               db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+               db.Column('problem_id', db.Integer, db.ForeignKey('problem.id'))
+               )
 
 
 class Team(db.Model):
@@ -14,6 +20,8 @@ class Team(db.Model):
     index = db.Column(db.Integer)
     listNum = db.Column(db.Integer)
     members = db.relationship('User')
+    updated = db.Column(db.DATE)
+    solvedToday = db.Column(db.Boolean)
 
 
 class User(db.Model, UserMixin):
@@ -28,3 +36,4 @@ class Problem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(7))
     solvers = db.relationship('User', secondary=sols, backref=db.backref('solutions', lazy='dynamic'))
+    leavers = db.relationship('User', secondary=due, backref=db.backref('dues', lazy='dynamic'))

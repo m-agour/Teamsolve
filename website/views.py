@@ -1,3 +1,4 @@
+import datetime
 from random import random, choice
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
@@ -20,7 +21,7 @@ def home():
         team = Team(name="", problemsNum=0, index=0, members=[], listNum=0, id=9999)
         return render_template("home.html", user=current_user, team=team, problemset=[], solved=[],
                                code=encrypt_id(team.id), team_mates=[], colors=[])
-
+    new_day()
     sol = get_today_solved_problems_ids(current_user)
     problems = get_today_problems_list()
     team_mates = get_team_mates()
@@ -41,7 +42,15 @@ def home():
 @login_required
 def solved():
     problemIndex = int(request.args.get('num'))
+    new = request.args.get('type') == 'new'
     current_user.solutions.append(Problem.query.get(problemIndex))
+
+    if not new:
+        for i in list(Problem.query.filter(Problem.id == problemIndex).all()):
+            current_user.dues.remove(i)
+    else:
+        get_team().solvedToday = True
+
     db.session.commit()
     return redirect(url_for('views.home'))
 
@@ -75,8 +84,8 @@ def settings():
             elif number > 50:
                 flash('Woo! take it easy champ, leave some for next month. (max is 50 per day)', category='error')
 
-            elif index <= 0:
-                flash('Index must be positive.', category='error')
+            elif index < 0:
+                flash('Index must be greater than zero.', category='error')
 
             elif index > 7000:
                 flash('Index is so large.', category='error')
@@ -136,6 +145,10 @@ def get_today_solved_problems_list(user):
     return user.solutions.filter(Problem.id >= start, Problem.id < end).all()
 
 
+def get_today_unsolved_problems_list(user):
+    return [i for i in get_today_problems_list() if i not in get_today_solved_problems_list(user)]
+
+
 def get_today_solved_problems_ids(user):
     return [i.id for i in get_today_solved_problems_list(user)]
 
@@ -146,4 +159,28 @@ def get_team_mates():
     return teamMates
 
 
+def new_day():
+    team = get_team()
+    if is_new_day():
+        team.updated = datetime.datetime.now().date()
+        if is_solved():
+            set_dues()
+            team.index += team.problemsNum
+            team.solvedToday = False
+        db.session.commit()
 
+
+def set_dues():
+    mates = list(User.query.filter(User.teamId == get_team().id).all())
+    for i in mates:
+        for j in get_today_unsolved_problems_list(i):
+            i.dues.append(j)
+    db.session.commit()
+
+
+def is_new_day():
+    return str(get_team().updated) != str(datetime.datetime.now().date())
+
+
+def is_solved():
+    return get_team().solvedToday

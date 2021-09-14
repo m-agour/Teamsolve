@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User, Team
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -64,7 +66,8 @@ def createTeam():
             flash('Woo! take it easy champ, leave some for next month. (max is 50 per day)', category='error')
 
         else:
-            new_team = Team(name=name, problemsNum=number, index=0, members=[current_user], listNum=0)
+            new_team = Team(name=name, problemsNum=number, index=0, members=[current_user], listNum=0,
+                            solvedToday=False, updated=datetime.datetime.now().date())
             db.session.add(new_team)
             db.session.commit()
             join_team(new_team.id)
