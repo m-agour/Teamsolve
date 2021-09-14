@@ -83,7 +83,6 @@ def createTeam():
 def joinTeam():
     if request.method == 'POST':
         code = request.form.get('code')
-        print(decrypt_id(code))
         if not code:
             flash('Please enter the invitation code.', category='error')
 
@@ -150,8 +149,7 @@ def sign_up():
                 p = Problem.query.filter(Problem.code == i).first()
                 if p:
                     current_user.solutions.append(p)
-                else:
-                    print(p)
+
             db.session.commit()
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
