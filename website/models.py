@@ -36,7 +36,7 @@ class Problem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer)
     solveCount = db.Column(db.Integer)
-    name = db.Column(db.String(20))
+    name = db.Column(db.String(50))
     code = db.Column(db.String(8))
     solvers = db.relationship('User', secondary=sols, backref=db.backref('solutions', lazy='dynamic'))
     leavers = db.relationship('User', secondary=due, backref=db.backref('dues', lazy='dynamic'))

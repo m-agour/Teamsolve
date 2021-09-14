@@ -65,7 +65,10 @@ def load_problems(app):
     from website.models import Problem
     problems = generate_ordered_problems_id_name_solved()
     for i in range(len(problems)):
-        prob = Problem(code=problems[i][0], name=problems[i][1], rating=problems[i][2], solveCount=problems[i][3])
+        name = problems[i][1]
+        if len(name) > 50:
+            name = name[:45] + '...'
+        prob = Problem(code=problems[i][0], name=name , rating=problems[i][2], solveCount=problems[i][3])
         db.session.add(prob)
     db.session.commit()
 
