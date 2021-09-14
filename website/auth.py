@@ -1,9 +1,10 @@
 import datetime
-
+import requests
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User, Team
+from .models import User, Team, Problem
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
+from .codeforces.codeforces_api import get_solved_problems
 from flask_login import login_user, login_required, logout_user, current_user, user_logged_out
 
 auth = Blueprint('auth', __name__)
@@ -116,10 +117,15 @@ def sign_up():
     if request.method == 'POST':
         email = request.form.get('email')
         name = request.form.get('name')
+        handle = request.form.get('handle')
         pass1 = request.form.get('password1')
         pass2 = request.form.get('password2')
 
         user = User.query.filter_by(email=email).first()
+
+        solved_problems = get_solved_problems(handle)
+
+
         if user:
             flash('Email already exists.', category='error')
         elif len(email) < 4:
@@ -130,11 +136,23 @@ def sign_up():
             flash('Passwords don\'t match.', category='error')
         elif len(pass1) < 7:
             flash('Password must be at least 7 characters.', category='error')
+
+        elif isinstance(solved_problems, bool):
+            flash('Please enter a valid codeforces handle.', category='error')
+
         else:
-            new_user = User(email=email, name=name, password=generate_password_hash(pass1, method='sha256'))
+            new_user = User(email=email, name=name, password=generate_password_hash(pass1, method='sha256'),
+                            handle=handle)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
+            for i in solved_problems:
+                p = Problem.query.filter(Problem.code == i).first()
+                if p:
+                    current_user.solutions.append(p)
+                else:
+                    print(p)
+            db.session.commit()
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 

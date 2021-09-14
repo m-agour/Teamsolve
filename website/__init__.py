@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_login import LoginManager
 import psycopg2
+from .codeforces.codeforces_api import *
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -62,9 +63,9 @@ def create_database(app):
 
 def load_problems(app):
     from website.models import Problem
-    problems = json.load(open("assets/problems.json", "r"))
+    problems = generate_ordered_problems_id_name_solved()
     for i in range(len(problems)):
-        prob = Problem(name=problems[i])
+        prob = Problem(code=problems[i][0], name=problems[i][1], rating=problems[i][2], solveCount=problems[i][3])
         db.session.add(prob)
     db.session.commit()
 

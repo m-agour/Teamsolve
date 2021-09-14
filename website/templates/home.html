@@ -53,7 +53,7 @@
                   <li class="list-group-item" {% if problem.id in solved %} style="background-color: springgreen;" {% else %} style="background-color: mintcream;" {% endif %} >
                   <div class="row align-items-center no-gutters">
                      <div class="col me-2"><span style="font-size: 20px;font-weight: bold;font-family: Nunito, sans-serif;">{{ problem.name }}</span></div>
-                     {% set url = 'https://codeforces.com/problemset/problem/' + problem.name %}
+                     {% set url = 'https://codeforces.com/problemset/problem/' + problem.code %}
                      <div class="col-auto">
                         {% if problem.id not in solved %}
                         <button class="btn btn-primary" type="button" style="text-align: center;padding-right: 11px;margin-right: 18px;height: 35px;width: 86.125px;" onclick="window.location.href='{{ url_for( "views.solved", num=problem.id,  type="new") }}';">Solved?</button>
@@ -82,7 +82,7 @@
                   <li class="list-group-item" {% if problem.id in solved %} style="background-color: springgreen;" {% else %} style="background-color: indianred;" {% endif %} >
                   <div class="row align-items-center no-gutters">
                      <div class="col me-2"><span style="font-size: 20px;font-weight: bold;font-family: Nunito, sans-serif; color: black;">{{ problem.name }}</span></div>
-                     {% set url = 'https://codeforces.com/problemset/problem/' + problem.name %}
+                     {% set url = 'https://codeforces.com/problemset/problem/' + problem.code %}
                      <div class="col-auto">
                         {% if problem.id not in solved %}
                         <button class="btn btn-primary" type="button" style="text-align: center;padding-right: 11px;margin-right: 18px;height: 35px;width: 86.125px;" onclick="window.location.href='{{ url_for( "views.solved", num=problem.id,  type="due") }}';">Solved?</button>

@@ -4,6 +4,7 @@ from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 from .models import User, Team, Problem
 from .auth import encrypt_id
+from .codeforces.codeforces_api import *
 
 
 views = Blueprint("views", __name__)
@@ -13,6 +14,7 @@ views = Blueprint("views", __name__)
 @login_required
 def home():
     team = get_team()
+    # update_user_and_mates(team)
     if not team:
         team = Team(name="", problemsNum=0, index=0, members=[], listNum=0, id=9999)
         return render_template("home.html", user=current_user, team=team, problemset=[], solved=[],
@@ -157,9 +159,10 @@ def get_team_mates():
 
 def new_day():
     team = get_team()
+    update_user_and_mates(team)
     if is_new_day():
         team.updated = datetime.datetime.now().date()
-        if is_solved():
+        if someone_solved_today():
             set_dues()
             team.index += team.problemsNum
             team.solvedToday = False
@@ -178,5 +181,32 @@ def is_new_day():
     return str(get_team().updated) != str(datetime.datetime.now().date())
 
 
-def is_solved():
+def someone_solved_today():
     return get_team().solvedToday
+
+
+def update_user_solved_problems(user):
+    solved_on_codeforces = get_solved_problems(user.handle)
+    solutions = user.solutions
+    for i in solved_on_codeforces:
+        problem = solutions.filter(Problem.code == i).first()
+        print(problem)
+        if not problem:
+            problem = Problem.query.filter(Problem.code == i).first()
+            if problem:
+                user.solutions.append(problem)
+        else:
+            db.session.commit()
+            return
+        db.session.commit()
+
+
+def update_user_and_mates(team):
+    for i in User.query.filter_by(teamId=team.id).all():
+        update_user_solved_problems(i)
+
+
+def update_all_teams():
+    teams = Team.query.filter_by(teamId=current_user.teamId).all()
+    for team in teams:
+        update_user_and_mates(team)
