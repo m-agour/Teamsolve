@@ -1,4 +1,6 @@
 import datetime
+
+import pytz
 import requests
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User, Team, Problem
@@ -67,8 +69,10 @@ def createTeam():
             flash('Woo! take it easy champ, leave some for next month. (max is 50 per day)', category='error')
 
         else:
+            tz = pytz.timezone('Africa/Cairo')
+            date = datetime.datetime.now(tz).date()
             new_team = Team(name=name, problemsNum=number, index=0, members=[current_user], listNum=0,
-                            solvedToday=False, updated=datetime.datetime.now().date())
+                            solvedToday=False, updated=date)
             db.session.add(new_team)
             db.session.commit()
             join_team(new_team.id)
