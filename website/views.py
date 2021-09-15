@@ -11,10 +11,6 @@ from .codeforces.codeforces_api import *
 views = Blueprint("views", __name__)
 
 
-def print_hi():
-    print("hi")
-
-
 @views.route('/', methods=["GET", "POST"])
 @login_required
 def home():
@@ -171,15 +167,15 @@ def new_day(team):
         update_user_and_mates(team)
         if is_new_day(team):
             team.updated = datetime.datetime.now().date()
-            if someone_solved_today():
-                set_dues()
+            if someone_solved_today(team):
+                set_dues(team)
                 team.index += team.problemsNum
                 team.solvedToday = False
             db.session.commit()
 
 
-def set_dues():
-    mates = list(User.query.filter(User.teamId == get_team().id).all())
+def set_dues(team):
+    mates = list(User.query.filter(User.teamId == team.id).all())
     for i in mates:
         for j in get_today_unsolved_problems_list(i):
             i.dues.append(j)
@@ -189,12 +185,11 @@ def set_dues():
 def is_new_day(team):
     tz = pytz.timezone('Africa/Cairo')
     date = datetime.datetime.now(tz).date()
-    print(date, team.updated)
     return str(team.updated) != str(date)
 
 
-def someone_solved_today():
-    return get_team().solvedToday
+def someone_solved_today(team):
+    return team.solvedToday
 
 
 def update_user_solved_problems(user):
