@@ -189,6 +189,7 @@ def set_dues():
 def is_new_day(team):
     tz = pytz.timezone('Africa/Cairo')
     date = datetime.datetime.now(tz).date()
+    print(date, team.updated)
     return str(team.updated) != str(date)
 
 
