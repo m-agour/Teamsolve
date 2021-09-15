@@ -191,7 +191,6 @@ def update_user_solved_problems(user):
     solutions = user.solutions
     for i in solved_on_codeforces:
         problem = solutions.filter(Problem.code == i).first()
-        print(problem)
         if not problem:
             problem = Problem.query.filter(Problem.code == i).first()
             if problem:
