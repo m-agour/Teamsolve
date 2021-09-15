@@ -1,6 +1,6 @@
 import datetime
 from threading import Thread
-
+import pytz
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from . import db, app
 from flask_login import login_user, login_required, logout_user, current_user
@@ -187,7 +187,9 @@ def set_dues():
 
 
 def is_new_day(team):
-    return str(team.updated) != str(datetime.datetime.now().date())
+    tz = pytz.timezone('Africa/Cairo')
+    datetime.date(2021, 9, 16)
+    return str(team.updated) != str(datetime.datetime.now(tz).date())
 
 
 def someone_solved_today():
