@@ -1,13 +1,18 @@
 import datetime
+from threading import Thread
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from . import db
+from . import db, app
 from flask_login import login_user, login_required, logout_user, current_user
 from .models import User, Team, Problem
 from .auth import encrypt_id
 from .codeforces.codeforces_api import *
 
-
 views = Blueprint("views", __name__)
+
+
+def print_hi():
+    print("hi")
 
 
 @views.route('/', methods=["GET", "POST"])
@@ -19,7 +24,11 @@ def home():
         team = Team(name="", problemsNum=0, index=0, members=[], listNum=0, id=9999)
         return render_template("home.html", user=current_user, team=team, problemset=[], solved=[],
                                code=encrypt_id(team.id), team_mates=[], colors=[])
-    new_day()
+
+    thread = Thread(target=new_day, args=(team,))
+    thread.daemon = True
+    thread.start()
+
     sol = get_today_solved_problems_ids(current_user)
     problems = get_today_problems_list()
     team_mates = get_team_mates()
@@ -157,16 +166,16 @@ def get_team_mates():
     return teamMates
 
 
-def new_day():
-    team = get_team()
-    update_user_and_mates(team)
-    if is_new_day():
-        team.updated = datetime.datetime.now().date()
-        if someone_solved_today():
-            set_dues()
-            team.index += team.problemsNum
-            team.solvedToday = False
-        db.session.commit()
+def new_day(team):
+    with app.app_context():
+        update_user_and_mates(team)
+        if is_new_day(team):
+            team.updated = datetime.datetime.now().date()
+            if someone_solved_today():
+                set_dues()
+                team.index += team.problemsNum
+                team.solvedToday = False
+            db.session.commit()
 
 
 def set_dues():
@@ -177,8 +186,8 @@ def set_dues():
     db.session.commit()
 
 
-def is_new_day():
-    return str(get_team().updated) != str(datetime.datetime.now().date())
+def is_new_day(team):
+    return str(team.updated) != str(datetime.datetime.now().date())
 
 
 def someone_solved_today():

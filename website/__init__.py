@@ -7,17 +7,20 @@ import psycopg2
 from .codeforces.codeforces_api import *
 
 db = SQLAlchemy()
+app = None
 DB_NAME = "database.db"
 
 sqlite = False
 
 
 def create_app():
+    global app
     app = Flask(__name__)
     if not sqlite:
         # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
-        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
+        app.config[
+            'SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
 
     else:
         app.config['SECRET_KEY'] = 'hello darkness my old friend'
@@ -68,8 +71,6 @@ def load_problems(app):
         name = problems[i][1]
         if len(name) > 50:
             name = name[:45] + '...'
-        prob = Problem(code=problems[i][0], name=name , rating=problems[i][2], solveCount=problems[i][3])
+        prob = Problem(code=problems[i][0], name=name, rating=problems[i][2], solveCount=problems[i][3])
         db.session.add(prob)
     db.session.commit()
-
-
