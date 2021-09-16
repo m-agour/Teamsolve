@@ -78,14 +78,15 @@ def load_problems():
     new_set = Set(name='Top solved', type='main')
     db.session.add(new_set)
 
-    for i in range(len(problems)):
+    # for i in range(len(problems)):
+    for i in range(2000):
         name = problems[i][1]
         if len(name) > 50:
             name = name[:45] + '...'
         prob = Problem(code=problems[i][0], name=name, rating=problems[i][2], solveCount=problems[i][3],
                        judge='Codeforces')
         db.session.add(prob)
-        new_set.problems.append(prob)
+        # new_set.problems.append(prob)
     db.session.commit()
 
 
