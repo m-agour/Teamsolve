@@ -71,8 +71,8 @@ def createTeam():
         else:
             tz = pytz.timezone('Africa/Cairo')
             date = datetime.datetime.now(tz).date()
-            new_team = Team(name=name, problemsNum=number, index=0, members=[current_user], listNum=0,
-                            solvedToday=False, updated=date)
+            new_team = Team(name=name, problemsNum=number, index=0, members=[current_user],
+                            solvedToday=False, updated=date, setId=1)
             db.session.add(new_team)
             db.session.commit()
             join_team(new_team.id)

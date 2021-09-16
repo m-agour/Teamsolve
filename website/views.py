@@ -4,7 +4,7 @@ import pytz
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from . import db, app
 from flask_login import login_user, login_required, logout_user, current_user
-from .models import User, Team, Problem
+from .models import User, Team, Problem, Set
 from .auth import encrypt_id
 from .codeforces.codeforces_api import *
 
@@ -14,6 +14,12 @@ views = Blueprint("views", __name__)
 @views.route('/', methods=["GET", "POST"])
 @login_required
 def home():
+
+    if request.method == 'POST':
+        current_user.darkMode = not current_user.darkMode
+        db.session.commit()
+
+
     team = get_team(current_user.teamId)
     # update_user_and_mates(team)
     if not team:
@@ -109,7 +115,11 @@ def settings():
             db.session.commit()
             flash('You left the team!', category='success')
             return redirect(url_for('views.home'))
-    return render_template("settings.html", user=current_user, team=get_team(current_user.teamId))
+
+    sets = Set.query.filter(Set.type != 'category').all()
+    sets = [(x, len(x.problems.all())) for x in sets]
+    print(sets)
+    return render_template("settings.html", user=current_user, team=get_team(current_user.teamId), sets=sets)
 
 
 def get_team(id):

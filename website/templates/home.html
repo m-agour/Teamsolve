@@ -1,11 +1,22 @@
 {% extends "index.html" %} {% block title %}Home{% endblock %}
+{% block dark %}
+
+<form method="POST">
+   <div class="form-check form-switch" style="margin-top: 5px;font-size: 18px; margin-right: 30px;">
+  <input class="form-check-input" onclick="this.form.submit()" type="checkbox" id="switch" {% if user.darkMode %} checked {% endif %}>
+  <label class="form-check-label" for="switch">Dark mode</label>
+   </div>
+</form>
+{% endblock %}
+
+
 {% block content %}
 {% if not user.teamId %}
 <div class="col text-center" style="margin: 1px;"><a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="/create-team" style="padding-right: 2;padding-bottom: 2;padding-left: 2;padding-top: 2;height: 30.8px;width: 121.325px;"><i class="fas fa-plus fa-sm text-white-50"></i>&nbsp;Create Team</a><a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="/join-team" style="margin: 13px;"><i class="fas fa-road fa-sm text-white-50"></i>&nbsp; Join Existing Team</a></div>
 {% else %}
-<div class="container-fluid">
+<div class="container-fluid" >
    <div class="d-sm-flex justify-content-between align-items-center mb-4">
-      <h3 class="text-dark mb-0">Hello, {{ user.name.split()[0] }} </h3>
+      <h3 {% if user.darkMode %}  class="text-white mb-0" {% else %} class="text-dark mb-0" {% endif %}> Hello, {{ user.name.split()[0] }} </h3>
    </div>
    <div class="card-group"></div>
    <div class="row">
