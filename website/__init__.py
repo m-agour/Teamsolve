@@ -7,7 +7,9 @@ import psycopg2
 from .codeforces.codeforces_api import *
 
 db = SQLAlchemy()
-app = None
+
+app = Flask(__name__)
+
 DB_NAME = "database.db"
 
 sqlite = False
@@ -15,7 +17,7 @@ sqlite = False
 
 def create_app():
     global app
-    app = Flask(__name__)
+
     if not sqlite:
         # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
