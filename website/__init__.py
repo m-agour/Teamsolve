@@ -52,8 +52,9 @@ def create_app():
     login_manager.init_app(app)
     with app.app_context():
         if not Problem.query.get(int(1)):
-            set_my_team()
+
             load_problems()
+            set_my_team()
             load_sets()
 
 
