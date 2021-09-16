@@ -180,11 +180,11 @@ def new_day(team):
     with app.app_context():
         if is_new_day(team):
             team.updated = datetime.datetime.now().date()
-            if someone_solved_today(team):
-                set_dues(team)
-                team.index += team.problemsNum
-                team.solvedToday = False
-                db.session.commit()
+            # if someone_solved_today(team):
+            set_dues(team)
+            team.index += team.problemsNum
+            team.solvedToday = False
+            db.session.commit()
 
 
 def set_dues(team):

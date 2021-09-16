@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 DB_NAME = "database.db"
 
-sqlite = True
+sqlite = False
 
 
 def create_app():
