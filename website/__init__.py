@@ -14,17 +14,27 @@ app = Flask(__name__)
 
 DB_NAME = "database.db"
 
-sqlite = False
+database = 'postgre'
 
 
 def create_app():
     global app
 
-    if not sqlite:
+    if database == 'postgre':
         # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
         app.config[
             'SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
+
+    elif database == 'mysql':
+        # app.config['MYSQL_USER'] = 'sql11437896'
+        # app.config['MYSQL_PASSWORD'] = 'sBAemF8i96'
+        # app.config['MYSQL_HOST'] = 'sql11.freemysqlhosting.net'
+        # app.config['MYSQL_DB'] ='sql11437896'
+        # app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+        # app.secret_key = 'sBAemF8i96'
+        # app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://sql11437896:sBAemF8i96@sql11.freemysqlhosting.net:3306/sql11437896'
 
     else:
         app.config['SECRET_KEY'] = 'hello darkness my old friend'
@@ -32,7 +42,6 @@ def create_app():
         app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(PROJECT_ROOT, 'database.db')
 
     db.init_app(app)
-
     from .views import views
     from .auth import auth
 
@@ -52,11 +61,11 @@ def create_app():
     login_manager.init_app(app)
     with app.app_context():
         if not Problem.query.get(int(1)):
-
             load_problems()
-            set_my_team()
+        if not Set.query.get(int(2)):
             load_sets()
-
+        if not User.query.get(int(1)):
+            set_my_team()
 
     @login_manager.user_loader
     def load_user(id):
@@ -66,7 +75,7 @@ def create_app():
 
 
 def create_database(app):
-    if not sqlite:
+    if database not in ['mysql', 'postgre']:
         if not os.path.exists('website/' + DB_NAME):
             db.create_all(app=app)
             print('Created Database!')
@@ -78,21 +87,23 @@ def load_problems():
     new_set = Set(name='Top solved', type='main')
     db.session.add(new_set)
 
-    # for i in range(len(problems)):
-    for i in range(2000):
+    for i in range(len(problems)):
         name = problems[i][1]
         if len(name) > 50:
             name = name[:45] + '...'
         prob = Problem(code=problems[i][0], name=name, rating=problems[i][2], solveCount=problems[i][3],
                        judge='Codeforces')
         db.session.add(prob)
-        # new_set.problems.append(prob)
+        new_set.problems.append(prob)
     db.session.commit()
 
 
 def load_sets():
     from .models import User, Team, Problem, Set
     sets = json.load(open('website/codeforces/sets.json'))
+
+    existing_problems = list(Problem.query.filter().all())
+    existing_problems_codes = [x.code for x in existing_problems]
     for s in sets:
         new_set = Set(name=s['name'], type=s['type'])
         db.session.add(new_set)
@@ -104,10 +115,9 @@ def load_sets():
             if len(name) > 50:
                 name = name[:45] + '...'
 
-            problem = Problem.query.filter(Problem.code == code, Problem.judge == judge).first()
-
-            if problem:
-                ...
+            # problem = existing_problems.filter(Problem.code == code, Problem.judge == judge).first()
+            if code in existing_problems_codes:
+                problem = existing_problems[existing_problems_codes.index(code)]
             else:
                 problem = Problem(code=prob['code'], name=name, rating=9999, solveCount=0,
                                judge='Codeforces')
@@ -122,7 +132,7 @@ def set_my_team():
     from .models import User, Team, Problem, Set
     tz = pytz.timezone('Africa/Cairo')
     date = datetime.datetime.now(tz).date()
-    my_team = Team(name='ERROR', problemsNum=3, index=48, setId=0, updated=date, solvedToday=True, members=[])
+    my_team = Team(name='ERROR', problemsNum=3, index=48, setId=1, updated=date, solvedToday=True, members=[])
     db.session.add(my_team)
     user1 = User(email='mohamedelfeky250@gmail.com', handle='Mohamed.-.Elfeky', password='sha256$FgzKH4Qn$6759112c8d461024fc4a240923c9de3ec0641452e0ea9ea3a3657a5da5bc652b', name='Mohamed Abdelfatah Elfeky', teamId='1', darkMode=False)
     user2 = User(email='mo.aggour@gmail.com', handle='M_Agour', password='sha256$TM30OmFM$6eeefef0ac53ade11375cb35d243949e0ff428589b19b3768df13b4d4d931271', name='Mohamed Nagy', teamId='1',  darkMode=False)

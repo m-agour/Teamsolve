@@ -9,3 +9,5 @@ APScheduler~=3.7.0
 psycopg2~=2.9.1
 requests~=2.25.1
 pytz~=2021.1
+mysqlclient
+MySQLdb

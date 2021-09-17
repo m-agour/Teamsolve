@@ -43,7 +43,7 @@ class Problem(db.Model):
     rating = db.Column(db.Integer)
     solveCount = db.Column(db.Integer)
     name = db.Column(db.String(50))
-    code = db.Column(db.String(8))
+    code = db.Column(db.String(20))
     judge = db.Column(db.String(15))
     solvers = db.relationship('User', secondary=sols, backref=db.backref('solutions', lazy='dynamic'))
     leavers = db.relationship('User', secondary=due, backref=db.backref('dues', lazy='dynamic'))
