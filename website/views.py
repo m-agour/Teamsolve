@@ -14,6 +14,7 @@ views = Blueprint("views", __name__)
 @views.route('/', methods=["GET", "POST"])
 @login_required
 def home():
+    print(Problem.query.filter(Problem.code == '208/A').first())
     if request.method == 'POST':
         current_user.darkMode = not current_user.darkMode
         db.session.commit()
@@ -129,12 +130,12 @@ def settings():
                            set_count=set_problems_count)
 
 
-def get_team(id):
-    return Team.query.get(id)
+def get_team(team_id):
+    return Team.query.get(team_id)
 
 
-def get_problem_name(id):
-    return Problem.query.get(id).name
+def get_problem_name(problem_id):
+    return Problem.query.get(problem_id).name
 
 
 def get_problems_start_id(user: User):
@@ -237,7 +238,7 @@ def update_user_and_mates(team):
         lst = User.query.filter_by(teamId=1).all()
         for i in lst:
             if update_user_solved_problems(i):
-                team.solvedToday = True
+                get_team(current_user.teamId).solvedToday = True
         db.session.commit()
 
 
