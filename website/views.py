@@ -112,7 +112,7 @@ def settings():
                 team.index = index
                 if set_id != team.setId:
                     team.setId = set_id
-                    index = 1
+                    team.index = 0
                 db.session.commit()
                 flash('Team settings has been modified!', category='success')
                 return redirect(url_for('views.settings'))
@@ -138,7 +138,7 @@ def get_problem_name(id):
 
 
 def get_problems_start_id(user: User):
-    return get_team(user.teamId).index + 1
+    return get_team(user.teamId).index
 
 
 def get_problems_number(user: User):
@@ -146,9 +146,13 @@ def get_problems_number(user: User):
 
 
 def get_today_problems_list(user: User):
+    setId = get_team(user.id).setId
     start = get_problems_start_id(user)
     end = start + get_problems_number(user)
-    return list(Problem.query.filter(Problem.id >= start, Problem.id < end).all())
+    if setId != 1:
+        return list(Set.query.get(setId).problems.filter_by().all())[start:end]
+    else:
+        return list(Problem.query.filter(Problem.id >= start + 1, Problem.id < end + 1).all())
 
 
 def get_today_problems_ids(user: User):
@@ -162,9 +166,10 @@ def get_today_problems_names(user: User):
 
 
 def get_today_solved_problems_list(user: User):
-    start = get_problems_start_id(user)
-    end = start + get_problems_number(user)
-    return user.solutions.filter(Problem.id >= start, Problem.id < end).all()
+    today = get_today_problems_list(current_user)
+    solved_overall = list(user.solutions.filter().all())
+    solved_today = [x for x in today if x in solved_overall]
+    return solved_today
 
 
 def get_today_unsolved_problems_list(user: User):
@@ -187,11 +192,11 @@ def new_day(team):
     with app.app_context():
         if is_new_day(team):
             team.updated = datetime.datetime.now().date()
-            # if someone_solved_today(team):
-            set_dues(team)
-            team.index += team.problemsNum
-            team.solvedToday = False
-            db.session.commit()
+            if someone_solved_today(team):
+                set_dues(team)
+                team.index += team.problemsNum
+                team.solvedToday = False
+                db.session.commit()
 
 
 def set_dues(team):
