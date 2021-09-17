@@ -2,64 +2,100 @@
 {% block content %}
 <div style="padding: 49px;">
    <form method="POST">
-      <h3 {% if user.darkMode %}  class="text-white mb-0" {% else %} class="text-dark mb-0" {% endif %} style="color: black; "  align="center">Change team settings</h3>
+      <h3 {% if user.darkMode %}  class="text-white mb-0" {% else %} class="text-dark mb-0" {% endif %} style="color: black; "  align="center">Settings</h3>
       <br>
-         <div class="row">
-            <div class="col order-first" >
-               <div class="card" style="background-color: ghostwhite" {% if user.darkMode %}  style="background: #17171b" {% else %} style="background: ghostwhite" {% endif %}>
-                  <center>
-                  <div class="form-group" style="margin-top: 30px; margin-left: 20px; margin-right:20px;">
-                     <label style="color: black;"  form="name">Team Name</label>
-                     <input type="name" style="text-align: center; width: 400px; color: red; font-weight: bold" class="form-control" id="name" value="{{team.name}}" name="name" placeholder="Enter Name ">
-                   </div>
-                   <br>
+      <div class="row">
+         <div class="col order-first" >
+            <div class="card"  style="background: white">
+                <div class="card-header" style="text-align:center;" >
+               <h4 class="text-dark fw-bold m-0" >Your profile</h4>
+               </div>
+            <center>
+               <div class="form-group" style="margin-top: 10px; margin-left: 20px; margin-right:20px;">
+                  <label style="color: black;font-weight: bold"  form="my-name">Name</label>
+                  <label for="my-name"></label><input type="username" style="text-align: center; width: 400px; color: red; font-weight: bold" class="form-control" id="my-name" value="{{user.name}}" name="my-name">
+               </div>
+               <br>
+               <div class="form-group" style="margin-top: 10px; margin-left: 20px; margin-right:20px;">
+                  <label style="color: black;font-weight: bold"  form="my-email">E-mail</label>
+                  <label for="my-email"></label><input type="email" style="text-align: center; width: 400px; color: red; font-weight: bold" class="form-control" id="my-email" value="{{user.email}}" name="my-handle" >
+               </div>
+               <br>
+               <div class="form-group" style="margin-top: 10px; margin-left: 20px; margin-right:20px;margin-bottom: 30px">
+                  <label style="color: black; font-weight: bold"  form="my-password">Password</label>
+                  <label for="my-password"></label><input type="password" style="text-align: center; width: 400px; color: red; font-weight: bold" class="form-control" id="my-password" value="{{team.name}}"  >
+               </div>
+            </center>
+         </div>
+            <br>
+            <div class="card"  style="background: white">
+                <div class="card-header" style="text-align:center;" >
+               <h4 class="text-dark fw-bold m-0" >Team</h4>
+               </div>
+            <center>
+               <div class="form-group" style="margin-top: 30px; margin-left: 20px; margin-right:20px;">
+                  <label style="color: black;"  form="name">Team Name</label>
+                  <input type="name" style="text-align: center; width: 400px; color: red; font-weight: bold" class="form-control" id="name" value="{{team.name}}" name="name" placeholder="Enter Name ">
+               </div>
+               <br>
                <div class="form-group" style="margin-top: 20px; margin-left: 20px; margin-right:20px; ">
                   <label style="width: 100px;color: black;" form="name">Daily goal</label>
                   <input type="number" style="width: 400px;color: red; text-align: center;font-weight: bold" step="1" min="1" max="50" value="{{team.problemsNum}}" class="form-control" id="number" name="number" placeholder="Enter problems number per day">
                </div>
-	           <br>
-	           <div class="form-group" style="margin-left: 20px; margin-right:20px; margin-bottom: 40px ">
-                   <label style="width: 100px;color: black;" form="name">Index</label>
-                  <input type="number" style="width: 400px;color: red; text-align: center;font-weight: bold" step="1" min="0" value="{{team.index}}" class="form-control" id="index" name="index" placeholder="Enter index ">
+               <br>
+               <div class="form-group" style="margin-left: 20px; margin-right:20px; margin-bottom: 40px ">
+                  <label style="width: 100px;color: black;" form="name">Index</label>
+                  <input type="number" style="width: 400px;color: red; text-align: center;font-weight: bold" step="1" min="0" max="{{set_count}}" value="{{team.index}}" class="form-control" id="index" name="index" placeholder="Enter index ">
                </div>
-              </center>
-            </div>
+            </center>
          </div>
-         <div class="col order-second" >
-                   <div class="card-group">
-            <div class="card">
-      <br>
-        {% for set, length in sets %}
-        <div class="form-check" style="margin-left: 20px; margin-right:20px; ">
-          <input class="form-check-input" type="radio" name='radio' id='{{ set.name }}'>
-          <label class="form-check-label" for='{{ set.name }}'>
-              <p>{{ set.name}}  Problems: {{length}}</p>
-          </label>
-        </div>
-        {% endfor %}
-</div>
-         </div></div></div>
-      <br>
-      <br>
-      <br>
-      <br>
-      <center>
-      <button type="submit" style="width: 200px" name="btn" value="change" class="btn btn-primary">Submit</button>
-      </center>
-   </form>
-   <br>
-   <br>
-   <br>
-   <hr style="width: auto"/>
-   <br>
-   <br>
-   <br>
-   <form  method="POST">
+      </div>
 
-      <center>
-         <button type="submit" name="btn" value="leave" class="btn btn-danger">Leave Team</button>
-      </center>
-   </form>
+      <div class="col order-second" >
+            <div class="card" >
+               <div class="card-header" style="text-align:center;" >
+               <h4 class="text-dark fw-bold m-0" >Ladders</h4>
+               </div>
+               <br>
+               <ul style=" max-height: 400px;margin-bottom: 10px;overflow-y: auto;-webkit-overflow-scrolling: touch; margin-right:20px">
+                   {% for set, length in sets %}
+                    <li class="list-group-item " >
+                       <div class="form-check" style="margin-right:20px; max-height: 10px">
+                          <input class="form-check-input" type="radio" value='{{ set.id }}' name='radio' id='{{ set.name }}' {% if team.setId == set.id %}checked {% endif %}>
+                          <label class="form-check-label" for='{{ set.name }}'>
+                             <p>{{ set.name}} </p>
+                          </label>
+
+                          <label for='{{ set.name }}' style="color: red ; text-align: right">
+                              <p> - ({{length}})</p>
+                          </label>
+                       </div>
+                    </li>
+                   {% endfor %}
+              </ul>
+            </div>
+      </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<center>
+<button type="submit" style="width: 200px" name="btn" value="change" class="btn btn-primary">Submit</button>
+</center>
+</form>
+<br>
+<br>
+<br>
+<hr style="width: auto"/>
+<br>
+<br>
+<br>
+<form  method="POST">
+   <center>
+      <button type="submit" name="btn" value="leave" class="btn btn-danger">Leave Team</button>
+   </center>
+</form>
 </div>
 <br> <br>
 {% endblock %}

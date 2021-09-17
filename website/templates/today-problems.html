@@ -1,0 +1,14 @@
+  {% for problem in problems %}
+  <li class="list-group-item" {% if problem.id in solved %} style="background-color: springgreen;" {% else %} style="background-color: mintcream;" {% endif %} >
+  <div class="row align-items-center no-gutters">
+     <div class="col me-2"><span style="font-size: 20px;font-weight: bold;font-family: Nunito, sans-serif;">{{ problem.name }}</span></div>
+     {% set url = 'https://codeforces.com/problemset/problem/' + problem.code %}
+     <div class="col-auto">
+        {% if problem.id not in solved and False %}
+        <button class="btn btn-primary" type="button" style="text-align: center;padding-right: 11px;margin-right: 18px;height: 35px;width: 86.125px;" onclick="window.location.href='{{ url_for( "views.solved", num=problem.id,  type="new") }}';">Solved?</button>
+        {% endif %}
+        <button  class="btn btn-primary" type="button" target='_blank'  style="text-align: center;padding-right: 11px;margin-left: 0px;height: 35px;width: 105.125px;margin-right: 0px;background: rgb(162,62,239);color: var(--bs-body-bg);border-style: none;border-color: var(--bs-blue);" onclick= "window.open('{{url}}','_blank');return false;">Codeforces</button>
+     </div>
+  </div>
+  </li>
+  {% endfor %}

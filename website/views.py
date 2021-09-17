@@ -14,11 +14,9 @@ views = Blueprint("views", __name__)
 @views.route('/', methods=["GET", "POST"])
 @login_required
 def home():
-
     if request.method == 'POST':
         current_user.darkMode = not current_user.darkMode
         db.session.commit()
-
 
     team = get_team(current_user.teamId)
     # update_user_and_mates(team)
@@ -32,18 +30,21 @@ def home():
         problems = get_today_problems_list(current_user)
         team_mates = get_team_mates()
         team_mates_ind = range(len(team_mates))
-        team_mates = [(team_mates[i].name, len(get_today_solved_problems_list(team_mates[i])), i) for i in team_mates_ind]
+        team_mates = [(team_mates[i].name, len(get_today_solved_problems_list(team_mates[i])), i) for i in
+                      team_mates_ind]
+
         team_mates = sorted(team_mates, key=lambda x: x[1], reverse=True)
 
-        colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c']
+        colors = ['#e6194B', '#4363d8', '#9A6324', '#911eb4', '#469990', '#808000', '#000075']
 
         while len(colors) < len(team_mates):
             colors += colors
-
+        team = get_team(current_user.teamId)
         new_day(team)
-        thread = Thread(target=update_user_and_mates, args=(team,))
-        thread.daemon = True
-        thread.start()
+        update_user_and_mates(team)
+        # thread = Thread(target=update_user_and_mates, args=(team,))
+        # thread.daemon = True
+        # thread.start()
 
         return render_template("home.html", user=current_user, team=team, problems=problems, solved=sol,
                                code=encrypt_id(team.id), team_mates=team_mates, colors=colors)
@@ -71,7 +72,10 @@ def solved():
 def settings():
     if not current_user.teamId:
         return redirect(url_for('views.home'))
+
+    set_problems_count = len(Set.query.get(get_team(current_user.teamId).setId).problems.all())
     if request.method == 'POST':
+        set_id = int(request.form['radio'])
         if request.form['btn'] == 'change':
             name = request.form.get('name')
             try:
@@ -98,7 +102,7 @@ def settings():
             elif index < 0:
                 flash('Index must be greater than zero.', category='error')
 
-            elif index > 7000:
+            elif index > set_problems_count:
                 flash('Index is so large.', category='error')
 
             else:
@@ -106,6 +110,9 @@ def settings():
                 team.name = name
                 team.problemsNum = number
                 team.index = index
+                if set_id != team.setId:
+                    team.setId = set_id
+                    index = 1
                 db.session.commit()
                 flash('Team settings has been modified!', category='success')
                 return redirect(url_for('views.settings'))
@@ -118,8 +125,8 @@ def settings():
 
     sets = Set.query.filter(Set.type != 'category').all()
     sets = [(x, len(x.problems.all())) for x in sets]
-    print(sets)
-    return render_template("settings.html", user=current_user, team=get_team(current_user.teamId), sets=sets)
+    return render_template("settings.html", user=current_user, team=get_team(current_user.teamId), sets=sets,
+                           set_count=set_problems_count)
 
 
 def get_team(id):
@@ -216,22 +223,21 @@ def update_user_solved_problems(user):
             if problem:
                 sol = True
                 user.solutions.append(problem)
-        else:
-            db.session.commit()
-            return sol
-        db.session.commit()
-        return sol
+    db.session.commit()
+    return sol
 
 
 def update_user_and_mates(team):
     with app.app_context():
-        for i in User.query.filter_by(teamId=team.id).all():
+        lst = User.query.filter_by(teamId=1).all()
+        for i in lst:
             if update_user_solved_problems(i):
                 team.solvedToday = True
         db.session.commit()
 
 
 def update_all_teams():
-    teams = Team.query.filter_by(teamId=current_user.teamId).all()
-    for team in teams:
-        update_user_and_mates(team)
+    with app.app_context():
+        teams = Team.query.filter_by(teamId=current_user.teamId).all()
+        for team in teams:
+            update_user_and_mates(team)

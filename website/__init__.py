@@ -14,6 +14,7 @@ app = Flask(__name__)
 
 DB_NAME = "database.db"
 
+# database = 'postgre'
 database = 'postgre'
 
 
@@ -23,8 +24,7 @@ def create_app():
     if database == 'postgre':
         # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
-        app.config[
-            'SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
+        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
 
     elif database == 'mysql':
         # app.config['MYSQL_USER'] = 'sql11437896'
