@@ -14,8 +14,8 @@ app = Flask(__name__)
 
 DB_NAME = "database.db"
 
-# database = 'postgre'
 database = 'postgre'
+# database = 'postgre'
 
 
 def create_app():
@@ -85,6 +85,7 @@ def load_problems():
     from website.models import Problem, Set
     problems = generate_ordered_problems_id_name_solved()
     new_set = Set(name='Top solved', type='main')
+    db.session.expunge_all()
     db.session.add(new_set)
 
     for i in range(len(problems)):

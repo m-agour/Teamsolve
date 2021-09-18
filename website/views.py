@@ -14,41 +14,43 @@ views = Blueprint("views", __name__)
 @views.route('/', methods=["GET", "POST"])
 @login_required
 def home():
-    if request.method == 'POST':
-        current_user.darkMode = not current_user.darkMode
-        db.session.commit()
+    with app.app_context():
+        if request.method == 'POST':
+            current_user.darkMode = not current_user.darkMode
+            db.session.commit()
 
-    team = get_team(current_user.teamId)
-    user = User.query.get(current_user.id)
-    # update_user_and_mates(team)
-    if not team:
-        team = Team(name="", problemsNum=0, index=0, members=[], listNum=0, id=9999)
-        return render_template("home.html", user=user, team=team, problemset=[], solved=[],
-                               code=encrypt_id(team.id), team_mates=[], colors=[])
+        team = get_team()
+        user = User.query.get(current_user.id)
+        # update_user_and_mates(team)
+        if not team:
+            team = Team(name="", problemsNum=0, index=0, members=[], listNum=0, id=9999)
+            return render_template("home.html", user=user, team=team, problemset=[], solved=[],
+                                   code=encrypt_id(team.id), team_mates=[], colors=[])
 
-    sol = get_today_solved_problems_ids(current_user)
-    problems = get_today_problems_list()
-    team_mates = get_team_mates()
-    team_mates_ind = range(len(team_mates))
-    team_mates = [(team_mates[i].name, len(get_today_solved_problems_list(team_mates[i])), i) for i in
-                  team_mates_ind]
+        sol = get_today_solved_problems_ids(get_current_user())
+        problems = get_today_problems_list()
+        team_mates = get_team_mates()
+        team_mates_ind = range(len(team_mates))
+        team_mates = [(team_mates[i].name, len(get_today_solved_problems_list(team_mates[i])), i) for i in
+                      team_mates_ind]
 
-    team_mates = sorted(team_mates, key=lambda x: x[1], reverse=True)
+        team_mates = sorted(team_mates, key=lambda x: x[1], reverse=True)
 
-    colors = ['#e6194B', '#4363d8', '#9A6324', '#911eb4', '#469990', '#808000', '#000075']
+        colors = ['#e6194B', '#4363d8', '#9A6324', '#911eb4', '#469990', '#808000', '#000075']
 
-    while len(colors) < len(team_mates):
-        colors += colors
-    team = get_team(current_user.teamId)
-    new_day(team)
-    update_user_and_mates(team)
-    # thread = Thread(target=update_user_and_mates, args=(team,))
-    # thread.daemon = True
-    # thread.start()
+        while len(colors) < len(team_mates):
+            colors += colors
 
-    dues = list(User.query.get(current_user.id).dues.filter().all())
-    return render_template("home.html", user=user, team=team, problems=problems, solved=sol,
-                           code=encrypt_id(team.id), team_mates=team_mates, colors=colors, dues=dues)
+        team = get_team()
+        dues = list(get_current_user().dues.filter().all())
+
+        new_day(team)
+        update_user_and_mates(team)
+        # thread = Thread(target=update_user_and_mates, args=(team,))
+        # thread.daemon = True
+        # thread.start()
+        return render_template("home.html", user=user, team=team, problems=problems, solved=sol,
+                               code=encrypt_id(team.id), team_mates=team_mates, colors=colors, dues=dues)
 
 
 @views.route('/solved')
@@ -56,13 +58,13 @@ def home():
 def solved():
     problemIndex = int(request.args.get('num'))
     new = request.args.get('type') == 'new'
-    current_user.solutions.append(Problem.query.get(problemIndex))
+    get_current_user().solutions.append(Problem.query.get(problemIndex))
 
     if not new:
         for i in list(Problem.query.filter(Problem.id == problemIndex).all()):
-            current_user.dues.remove(i)
+            get_current_user().dues.remove(i)
     else:
-        get_team(current_user.teamId).solvedToday = True
+        get_team().solvedToday = True
 
     db.session.commit()
     return redirect(url_for('views.home'))
@@ -71,10 +73,10 @@ def solved():
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
-    if not current_user.teamId:
+    if not get_current_user().teamId:
         return redirect(url_for('views.home'))
 
-    set_problems_count = len(Set.query.get(get_team(current_user.teamId).setId).problems.all())
+    set_problems_count = len(Set.query.get(get_team().setId).problems.all())
     if request.method == 'POST':
         set_id = int(request.form['radio'])
         if request.form['btn'] == 'change':
@@ -83,13 +85,13 @@ def settings():
                 number = int(request.form.get('number'))
             except:
                 flash("Please enter the goal.", category='error')
-                return render_template("team.html", user=current_user)
+                return render_template("team.html", user=get_current_user())
 
             try:
                 index = int(request.form.get('index'))
             except:
                 flash("Please enter the index.", category='error')
-                return render_template("team.html", user=current_user)
+                return render_template("team.html", user=get_current_user())
 
             if not name:
                 flash('Please enter a name.', category='error')
@@ -107,7 +109,7 @@ def settings():
                 flash('Index is so large.', category='error')
 
             else:
-                team = get_team(current_user.teamId)
+                team = get_team()
                 team.name = name
                 team.problemsNum = number
                 team.index = index
@@ -119,35 +121,40 @@ def settings():
                 return redirect(url_for('views.settings'))
 
         elif request.form['btn'] == 'leave':
-            current_user.teamId = None
+            get_current_user().teamId = None
             db.session.commit()
             flash('You left the team!', category='success')
             return redirect(url_for('views.home'))
 
     sets = Set.query.filter(Set.type != 'category').all()
     sets = [(x, len(x.problems.all())) for x in sets]
-    return render_template("settings.html", user=current_user, team=get_team(current_user.teamId), sets=sets,
+    return render_template("settings.html", user=get_current_user(), team=get_team(), sets=sets,
                            set_count=set_problems_count)
 
 
-def get_team(team_id):
-    return Team.query.get(team_id)
+def get_team():
+    return Team.query.get(get_current_user().teamId)
+
+
+def get_current_user():
+    return User.query.get(current_user.id)
+    # return current_user
 
 
 def get_problem_name(problem_id):
     return Problem.query.get(problem_id).name
 
 
-def get_problems_start_id(user: User = current_user):
-    return get_team(user.teamId).index
+def get_problems_start_id():
+    return get_team().index
 
 
-def get_problems_number(user: User = current_user):
-    return get_team(user.teamId).problemsNum
+def get_problems_number():
+    return get_team().problemsNum
 
 
-def get_today_problems_list(user: User = current_user):
-    setId = get_team(user.id).setId
+def get_today_problems_list():
+    setId = get_team().setId
     start = get_problems_start_id()
     end = start + get_problems_number()
     if setId != 1:
@@ -156,13 +163,13 @@ def get_today_problems_list(user: User = current_user):
         return list(Problem.query.filter(Problem.id >= start + 1, Problem.id < end + 1).all())
 
 
-def get_today_problems_ids(user: User = current_user):
+def get_today_problems_ids():
     start = get_problems_start_id()
     end = start + get_problems_number()
     return [i for i in range(start, end)]
 
 
-def get_today_problems_names(user: User = current_user):
+def get_today_problems_names():
     return [get_problem_name(i) for i in get_today_problems_ids()]
 
 
@@ -184,21 +191,20 @@ def get_today_solved_problems_ids(user: User):
 
 
 def get_team_mates():
-    teamMates = list(User.query.filter_by(teamId=current_user.teamId))
-    teamMates.remove(current_user)
+    teamMates = list(User.query.filter_by(teamId=get_current_user().teamId))
+    teamMates.remove(get_current_user())
     return teamMates
 
 
 def new_day(team):
-    team = get_team(current_user.teamId)
-    with app.app_context():
-        if is_new_day(team):
-            if someone_solved_today(team):
-                team.index += team.problemsNum
-                team.solvedToday = False
-                set_dues(team)
-                db.session.commit()
-            team.updated = datetime.datetime.now().date()
+    team = get_team()
+    if is_new_day(team):
+        if someone_solved_today(team):
+            team.index += team.problemsNum
+            team.solvedToday = False
+            set_dues(team)
+            db.session.commit()
+        team.updated = datetime.datetime.now().date()
 
 
 def set_dues(team):
@@ -209,10 +215,9 @@ def set_dues(team):
 
 
 def is_new_day(team):
-    with app.app_context():
-        tz = pytz.timezone('Africa/Cairo')
-        date = datetime.datetime.now(tz).date()
-        return str(team.updated) != str(date)
+    tz = pytz.timezone('Africa/Cairo')
+    date = datetime.datetime.now(tz).date()
+    return str(team.updated) != str(date)
 
 
 def someone_solved_today(team):
@@ -235,16 +240,14 @@ def update_user_solved_problems(user):
 
 
 def update_user_and_mates(team):
-    with app.app_context():
-        lst = User.query.filter_by(teamId=1).all()
-        for i in lst:
-            if update_user_solved_problems(i):
-                get_team(current_user.teamId).solvedToday = True
-        db.session.commit()
+    lst = User.query.filter_by(teamId=1).all()
+    for i in lst:
+        if update_user_solved_problems(i):
+            get_team().solvedToday = True
+    db.session.commit()
 
 
 def update_all_teams():
-    with app.app_context():
-        teams = Team.query.filter_by(teamId=current_user.teamId).all()
-        for team in teams:
-            update_user_and_mates(team)
+    teams = Team.query.filter_by(teamId=get_current_user().teamId).all()
+    for team in teams:
+        update_user_and_mates(team)
