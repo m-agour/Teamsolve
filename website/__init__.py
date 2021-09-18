@@ -15,7 +15,7 @@ app = Flask(__name__)
 DB_NAME = "database.db"
 
 database = 'postgre'
-# database = 'postgre'
+# database = 'sl'
 
 
 def create_app():

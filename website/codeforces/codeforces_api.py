@@ -59,10 +59,14 @@ def get_solved_problems(handle):
                 solved.append(f"{p['contestId']}/{p['index']}")
         return solved
     except:
-        if user['comment'] == f'handle: User with handle {handle} not found':
-            return False
-        else:
-            return get_solved_problems(handle)
+
+        try:
+            if user['comment'] == f'handle: User with handle {handle} not found':
+                return solved
+            else:
+                return solved
+        except:
+            return solved
 
 
 def generate_ordered_problems_id_name_solved():
