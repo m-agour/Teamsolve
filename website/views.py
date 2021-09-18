@@ -42,7 +42,7 @@ def home():
             colors += colors
 
         team = get_team()
-        dues = list(get_current_user().dues.filter().all())
+        dues = get_dues_list()
 
         update_user_and_mates(team)
         new_day(team)
@@ -224,7 +224,9 @@ def is_new_day(team):
 def someone_solved_today(team):
     return team.solvedToday
 
-
+def get_dues_list(user):
+    return list(user.dues.filter().all())
+    
 def update_user_solved_problems(user):
     sol = False
     solved_on_codeforces = get_solved_problems(user.handle)
@@ -234,7 +236,8 @@ def update_user_solved_problems(user):
         if not problem:
             problem = Problem.query.filter(Problem.code == i).first()
             if problem:
-                sol = True
+                if problem not in get_dues_list(user):
+                    sol = True
                 user.solutions.append(problem)
     db.session.commit()
     return sol
