@@ -201,11 +201,14 @@ def new_day(team):
     team = get_team()
     if is_new_day(team):
         if someone_solved_today(team):
+            tz = pytz.timezone('Africa/Cairo')
+            date = datetime.datetime.now(tz).date()
             set_dues(team)
             team.index += team.problemsNum
             team.solvedToday = False
+            team.updated = date
             db.session.commit()
-        team.updated = datetime.datetime.now().date()
+
 
 
 def set_dues(team):
@@ -224,9 +227,11 @@ def is_new_day(team):
 def someone_solved_today(team):
     return team.solvedToday
 
+
 def get_dues_list(user):
     return list(user.dues.filter().all())
-    
+
+
 def update_user_solved_problems(user):
     sol = False
     solved_on_codeforces = get_solved_problems(user.handle)
