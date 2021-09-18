@@ -27,6 +27,9 @@ def home():
             return render_template("home.html", user=user, team=team, problemset=[], solved=[],
                                    code=encrypt_id(team.id), team_mates=[], colors=[])
 
+        update_user_and_mates(team)
+        new_day(team)
+
         sol = get_today_solved_problems_ids(get_current_user())
         problems = get_today_problems_list()
         team_mates = get_team_mates()
@@ -43,9 +46,6 @@ def home():
 
         team = get_team()
         dues = get_dues_list(get_current_user())
-
-        update_user_and_mates(team)
-        new_day(team)
 
         # thread = Thread(target=update_user_and_mates, args=(team,))
         # thread.daemon = True
@@ -208,7 +208,6 @@ def new_day(team):
             team.solvedToday = False
             team.updated = date
             db.session.commit()
-
 
 
 def set_dues(team):
