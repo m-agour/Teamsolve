@@ -44,8 +44,9 @@ def home():
         team = get_team()
         dues = list(get_current_user().dues.filter().all())
 
-        new_day(team)
         update_user_and_mates(team)
+        new_day(team)
+
         # thread = Thread(target=update_user_and_mates, args=(team,))
         # thread.daemon = True
         # thread.start()
@@ -200,9 +201,9 @@ def new_day(team):
     team = get_team()
     if is_new_day(team):
         if someone_solved_today(team):
+            set_dues(team)
             team.index += team.problemsNum
             team.solvedToday = False
-            set_dues(team)
             db.session.commit()
         team.updated = datetime.datetime.now().date()
 
