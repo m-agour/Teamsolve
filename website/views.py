@@ -190,12 +190,13 @@ def get_team_mates():
 
 
 def new_day(team):
+    team = get_team(current_user.teamId)
     with app.app_context():
         if is_new_day(team):
             if someone_solved_today(team):
-                set_dues(team)
                 team.index += team.problemsNum
                 team.solvedToday = False
+                set_dues(team)
                 db.session.commit()
             team.updated = datetime.datetime.now().date()
 
@@ -205,7 +206,6 @@ def set_dues(team):
     for i in members:
         for j in get_today_unsolved_problems_list(i):
             i.dues.append(j)
-    db.session.commit()
 
 
 def is_new_day(team):
