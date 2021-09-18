@@ -42,7 +42,7 @@ def home():
             colors += colors
 
         team = get_team()
-        dues = get_dues_list()
+        dues = get_dues_list(get_current_user())
 
         update_user_and_mates(team)
         new_day(team)
