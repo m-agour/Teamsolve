@@ -26,7 +26,8 @@ def home():
             team = Team(name="", problemsNum=0, index=0, members=[], listNum=0, id=9999)
             return render_template("home.html", user=user, team=team, problemset=[], solved=[],
                                    code=encrypt_id(team.id), team_mates=[], colors=[])
-
+        # team.solvedToday = False
+        # db.session.commit()
         update_user_and_mates(team)
         new_day(team)
 
@@ -240,7 +241,9 @@ def update_user_solved_problems(user):
         if not problem:
             problem = Problem.query.filter(Problem.code == i).first()
             if problem:
-                if problem not in get_dues_list(user):
+                if problem in get_dues_list(user):
+                    user.dues.remove(problem)
+                else:
                     sol = True
                 user.solutions.append(problem)
     db.session.commit()
