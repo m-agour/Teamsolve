@@ -28,15 +28,16 @@ def home():
                                    code=encrypt_id(team.id), team_mates=[], colors=[])
         # team.solvedToday = False
         # db.session.commit()
-        update_user_and_mates(team)
-        new_day(team)
+
+        # update_user_and_mates(team)
+        # new_day(team)
 
         sol = get_today_solved_problems_ids(get_current_user())
         problems = get_today_problems_list()
         team_mates = get_team_mates()
         team_mates_ind = range(len(team_mates))
-        team_mates = [(team_mates[i].name, len(get_today_solved_problems_list(team_mates[i])), i) for i in
-                      team_mates_ind]
+        team_mates = [(team_mates[i].name, len(get_today_solved_problems_list(team_mates[i])), i,
+                       len(get_dues_list(team_mates[i]))) for i in team_mates_ind]
 
         team_mates = sorted(team_mates, key=lambda x: x[1], reverse=True)
 

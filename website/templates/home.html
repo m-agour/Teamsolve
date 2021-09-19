@@ -32,7 +32,7 @@
             <div class="card-body" style="padding-top: 16px;">
                <div class="row align-items-center no-gutters">
                   <div class="col me-2">
-                     <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>progress</span></div>
+                     <div class="text-uppercase text-info fw-bold text-xs mb-1"><h6 style="color: darkred; font-weight: bold">progress</h6></div>
                      <div class="row g-0 align-items-center">
                         <div class="col-auto">
                            <div class="text-dark fw-bold h5 mb-0 me-3"><span>{{ solved|length }} / {{ problems|length }} </span></div>
@@ -110,11 +110,21 @@
                <h6 class=" fw-bold m-0" style="color: darkslateblue; font-size: 20px; padding-left: 5px">Team mates progress</h6>
             </div>
             <div class="card-body">
-               {% for name, num, i in team_mates %}
+               {% for name, num, i, dues_num in team_mates %}
                {% set m = team_mates[i] %}
-               <h4 class="small fw-bold" style="color:{{ colors[i] }}">{{ name }}<span class="float-end" style="color: black">{{ num }} / {{ problems|length }}</span></h4>
+               <h4 class="small fw-bold" style="color:{{ colors[i] }}">{{ name }}
+                  <span class="float-end" {% if dues_num == 0 %} style="color: forestgreen; white-space:pre;" {% else %}  style="color: red;" {% endif %}> {{  dues_num }}</span>
+                  <span class="float-end" style="color:darkslategray"> dues </span>
+               </h4>
+                  <div>
+                     <h4 class="small fw-bold" style="color:{{ colors[i] }}"><span class="float-end" style="color: black; padding-left: 20px">{{ num }} / {{ problems|length }}</span></h4>
+                  </div>
+
+
                <div class="progress progress mb-4">
-                  <div class="progress-bar bg-gradient-primary"  aria-valuenow="{{num / problems|length * 100 }}" aria-valuemin="0" aria-valuemax="100" style=" background: {{ colors[i] }}; width: {{ num / problems|length * 100 }}%;"><span class="visually-hidden">{{ num / problems|length }}%</span></div>
+                  <div class="progress-bar bg-gradient-primary"  aria-valuenow="{{num / problems|length * 100 }}" aria-valuemin="0" aria-valuemax="100" style=" background: {{ colors[i] }}; width: {{ num / problems|length * 100 }}%;">
+                     <span class="visually-hidden">{{ num / problems|length }}%</span>
+                  </div>
                </div>
                {% endfor %}
             </div>
