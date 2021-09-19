@@ -29,8 +29,8 @@ def home():
         # team.solvedToday = False
         # db.session.commit()
 
-        # update_user_and_mates(team)
-        # new_day(team)
+        update_user_and_mates(team)
+        new_day(team)
 
         sol = get_today_solved_problems_ids(get_current_user())
         problems = get_today_problems_list()
@@ -52,6 +52,7 @@ def home():
         # thread = Thread(target=update_user_and_mates, args=(team,))
         # thread.daemon = True
         # thread.start()
+        cleanup()
         return render_template("home.html", user=user, team=team, problems=problems, solved=sol,
                                code=encrypt_id(team.id), team_mates=team_mates, colors=colors, dues=dues)
 
@@ -263,3 +264,9 @@ def update_all_teams():
     teams = Team.query.filter_by(teamId=get_current_user().teamId).all()
     for team in teams:
         update_user_and_mates(team)
+
+
+def cleanup():
+    db.session.close()
+    engine_container = db.get_engine(app)
+    engine_container.dispose()

@@ -14,9 +14,9 @@ app = Flask(__name__)
 
 DB_NAME = "database.db"
 
-# database = 'postgre'
+database = 'postgre'
 # database = 'sl'
-database = 'mysql'
+# database = 'mysql'
 
 
 def create_app():
@@ -24,8 +24,9 @@ def create_app():
 
     if database == 'postgre':
         # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-        app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
-        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
+        # app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
+        # app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
+        app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://uj3aeebzpdahht91m7n0:7ceA3QTx75vcdkPBy8ig@bpqfahzwwsnlabesuir4-postgresql.services.clever-cloud.com:5432/bpqfahzwwsnlabesuir4"
 
     elif database == 'mysql':
         # app.config['MYSQL_USER'] = 'sql11437896'
