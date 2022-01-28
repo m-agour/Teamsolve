@@ -23,19 +23,10 @@ def create_app():
     global app
 
     if database == 'postgre':
-        # app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
-        # app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ttnwfvvb:l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ@tai.db.elephantsql.com/ttnwfvvb"
         app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://uj3aeebzpdahht91m7n0:7ceA3QTx75vcdkPBy8ig@bpqfahzwwsnlabesuir4-postgresql.services.clever-cloud.com:5432/bpqfahzwwsnlabesuir4"
 
     elif database == 'mysql':
-        # app.config['MYSQL_USER'] = 'sql11437896'
-        # app.config['MYSQL_PASSWORD'] = 'sBAemF8i96'
-        # app.config['MYSQL_HOST'] = 'sql11.freemysqlhosting.net'
-        # app.config['MYSQL_DB'] ='sql11437896'
-        # app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-        # app.secret_key = 'sBAemF8i96'
-        # app.config['SECRET_KEY'] = "l_uz9HnfFDGC7XnLFjs8yAVrGDBPlRdJ"
         app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://sql11437896:sBAemF8i96@sql11.freemysqlhosting.net:3306/sql11437896'
 
     else:

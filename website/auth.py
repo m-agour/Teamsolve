@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from .codeforces.codeforces_api import get_solved_problems
 from flask_login import login_user, login_required, logout_user, current_user, user_logged_out
-
+from .queries import *
 auth = Blueprint('auth', __name__)
 
 
